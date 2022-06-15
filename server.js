@@ -1,5 +1,7 @@
 const express = require('express')
+const Article = require('./models/article')
 const articleRouter = require('./routes/articles')
+const methodOverride = require('method-override')
 const app = express()
 const dotenv= require ('dotenv')
 const colors = require ('colors')
@@ -15,19 +17,12 @@ connectDB()
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended:false}))
+app.use(methodOverride('_method'))
 
 
-app.get('/', (req, res) => {
-    const articles =[{
-        title: 'Test Article', 
-        createdAt: new Date(), 
-        description: 'Test description'
-    },
-    {
-        title: 'Test Article 2', 
-        createdAt: new Date(), 
-        description: 'Test description'
-    }]
+app.get('/', async (req, res) => {
+    const articles = await Article.find().sort({
+        createdAt:'desc' })
     res.render('articles/index', {articles: articles})
 })
 
